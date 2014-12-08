@@ -1,0 +1,51 @@
+{
+  "id": "nodejs-mongo-tesco-openshift",
+  "kind": "Template",
+  "apiVersion": "v1beta1",
+  "name": "nodejs-mongo-tesco-openshift-template",
+  "description": "This example shows how to create a simple Node application in openshift origin v3",
+  "items": [
+    {
+      "id": "nodeservice",
+      "kind": "Service",
+      "apiVersion": "v1beta1",
+      "port": 7000,
+      "containerPort": 7000,
+      "selector": {
+        "name": "address"
+      }
+    },
+    {
+      "id": "nodeservice",
+      "kind": "Deployment",
+      "apiVersion": "v1beta1",
+      "triggerPolicy": "manual",
+      "configId": "nodemongo-config",
+      "strategy": {
+        "type": "customPod",
+        "customPod": {
+          "image": "openshift/kube-deploy"
+        }
+      },
+      "controllerTemplate": {
+        "replicas": 10,
+        "replicaSelector": {
+          "name": "address"
+        },
+        "podTemplate": {
+          "desiredState": {
+            "manifest": {
+              "version": "v1beta1",
+              "containers": [{
+                "name": "nodejs-mongo",
+                "image": "nbabusundaram/tesco-kube-nodemongo-demo",
+                "ports": [{"containerPort": 7000}]
+              }]
+            }
+          },
+          "labels": {"name": "address"}
+        }
+      }
+    }
+  ]
+}
